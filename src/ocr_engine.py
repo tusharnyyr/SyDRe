@@ -6,7 +6,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 # If Tesseract is not on PATH, uncomment and set:
 # pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
-POPPLER_PATH = r"C:\poppler\Library\bin"
+import platform
+POPPLER_PATH = r"C:\poppler\Library\bin" if platform.system() == "Windows" else None
 
 
 def _contains_devanagari(text: str) -> bool:

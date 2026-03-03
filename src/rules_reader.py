@@ -1,7 +1,7 @@
 import re
 from pathlib import Path
 
-RULES_FILE_PATH = Path(r"C:\SyDRe\rules.txt")
+RULES_FILE_PATH = Path(__file__).parent.parent / "rules.txt"
 
 
 def load_rules(rules_path: Path = RULES_FILE_PATH) -> list[dict]:

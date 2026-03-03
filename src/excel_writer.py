@@ -50,7 +50,7 @@ def _score_fill(score: float) -> PatternFill:
     return RED_FILL
 
 
-def write_excel(results: list[dict], output_dir: str = r"C:\SyDRe\output") -> str:
+def write_excel(results: list[dict], output_dir: str = None) -> str:
     """
     Write ranked retrieval results to a formatted Excel file.
 
@@ -59,6 +59,9 @@ def write_excel(results: list[dict], output_dir: str = r"C:\SyDRe\output") -> st
 
     Returns the full path of the created file.
     """
+    if output_dir is None:
+        output_dir = Path(__file__).parent.parent / "output"
+
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
 
@@ -75,16 +78,17 @@ def write_excel(results: list[dict], output_dir: str = r"C:\SyDRe\output") -> st
     ws.title = "Summary"
 
     # --- Collect ordered unique vendors and rules ---
-    vendors     = []
+    vendors      = []
     seen_vendors = set()
-    rules       = []
-    seen_rules  = set()
+    rules        = []
+    seen_rules   = set()
 
     for r in results:
         v   = r.get("vendor_id", "")
         rid = r.get("rule_id",   "")
         if v   and v   not in seen_vendors:
-            vendors.append(v);                       seen_vendors.add(v)
+            vendors.append(v)
+            seen_vendors.add(v)
         if rid and rid not in seen_rules:
             rules.append({"rule_id": rid, "rule_text": r.get("rule_text", "")})
             seen_rules.add(rid)
@@ -98,8 +102,7 @@ def write_excel(results: list[dict], output_dir: str = r"C:\SyDRe\output") -> st
         if key not in lookup or r.get("rank", 99) < lookup[key].get("rank", 99):
             lookup[key] = r
 
-    # ── Row 1: Vendor merged headers ────────────────────────────────────────────
-    # Col A = Rule ID, Col B = Rule Text, then 3 cols per vendor
+    # ── Row 1: Vendor merged headers ─────────────────────────────────────────
     for fixed_col, label in [(1, "Rule ID"), (2, "Rule Text")]:
         cell = ws.cell(row=1, column=fixed_col, value=label)
         _style(cell, font=BOLD_WHITE_FONT, fill=HEADER_FILL)
@@ -114,13 +117,12 @@ def write_excel(results: list[dict], output_dir: str = r"C:\SyDRe\output") -> st
         cell = ws.cell(row=1, column=start_col, value=vendor)
         _style(cell, font=BOLD_WHITE_FONT, fill=HEADER_FILL)
 
-        # Apply border to all merged cells individually
         for mc in range(start_col, end_col + 1):
             ws.cell(row=1, column=mc).border = ALL_BORDERS
 
     ws.row_dimensions[1].height = 28
 
-    # ── Row 2: Sub-headers (File Name | Page | Score) ───────────────────────────
+    # ── Row 2: Sub-headers (File Name | Page | Score) ────────────────────────
     for fixed_col, label in [(1, "Rule ID"), (2, "Rule Text")]:
         cell = ws.cell(row=2, column=fixed_col, value=label)
         _style(cell, font=BOLD_WHITE_FONT, fill=SUBHEADER_FILL)
@@ -133,22 +135,19 @@ def write_excel(results: list[dict], output_dir: str = r"C:\SyDRe\output") -> st
 
     ws.row_dimensions[2].height = 25
 
-    # ── Data rows: one row per rule ──────────────────────────────────────────────
+    # ── Data rows: one row per rule ───────────────────────────────────────────
     for r_idx, rule in enumerate(rules):
         row = r_idx + 3
 
-        # Rule ID
         cell = ws.cell(row=row, column=1, value=rule["rule_id"])
         _style(cell, font=BOLD_FONT, fill=RULE_ID_FILL)
 
-        # Rule Text
         cell = ws.cell(row=row, column=2, value=rule["rule_text"])
         _style(cell, font=DEFAULT_FONT, fill=RULE_ID_FILL, alignment=LEFT_ALIGN)
 
-        # Vendor columns
         for v_idx, vendor in enumerate(vendors):
-            key     = (rule["rule_id"], vendor)
-            result  = lookup.get(key)
+            key      = (rule["rule_id"], vendor)
+            result   = lookup.get(key)
             base_col = 3 + (v_idx * 3)
 
             if result:
@@ -161,7 +160,6 @@ def write_excel(results: list[dict], output_dir: str = r"C:\SyDRe\output") -> st
 
                 for cell in (file_cell, page_cell, score_cell):
                     _style(cell, font=DEFAULT_FONT, fill=fill)
-
             else:
                 for offset in range(3):
                     cell = ws.cell(row=row, column=base_col + offset, value="—")
@@ -169,7 +167,7 @@ def write_excel(results: list[dict], output_dir: str = r"C:\SyDRe\output") -> st
 
         ws.row_dimensions[row].height = 35
 
-    # ── Column widths ────────────────────────────────────────────────────────────
+    # ── Column widths ─────────────────────────────────────────────────────────
     ws.column_dimensions["A"].width = 10
     ws.column_dimensions["B"].width = 45
 
@@ -179,7 +177,6 @@ def write_excel(results: list[dict], output_dir: str = r"C:\SyDRe\output") -> st
         ws.column_dimensions[openpyxl.utils.get_column_letter(base + 1)].width = 8
         ws.column_dimensions[openpyxl.utils.get_column_letter(base + 2)].width = 10
 
-    # Freeze Rule ID + Rule Text columns and both header rows
     ws.freeze_panes = "C3"
 
     # ════════════════════════════════════════════════════════════════════════════
@@ -216,7 +213,6 @@ def write_excel(results: list[dict], output_dir: str = r"C:\SyDRe\output") -> st
         ]
 
         for col_idx, value in enumerate(values, start=1):
-            # Snippet column — left aligned for readability
             align = LEFT_ALIGN if col_idx == 9 else CENTER_ALIGN
             cell  = ws2.cell(row=row_idx, column=col_idx, value=value)
             _style(cell, font=DEFAULT_FONT, fill=fill, alignment=align)

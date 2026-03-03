@@ -18,8 +18,10 @@ from rules_reader import load_rules
 from pipeline import run_pipeline
 from excel_writer import write_excel
 
-RULES_PATH = Path(r"C:\SyDRe\rules.txt")
-OUTPUT_DIR = Path(r"C:\SyDRe\output")
+BASE_DIR = Path(__file__).parent
+RULES_PATH = BASE_DIR / "rules.txt"
+OUTPUT_DIR = BASE_DIR / "output"
+OUTPUT_DIR.mkdir(exist_ok=True)
 
 # ── Page config ────────────────────────────────────────────────────────────────
 st.set_page_config(

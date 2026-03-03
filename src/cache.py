@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 from pathlib import Path
 
-CACHE_DIR = Path(r"C:\SyDRe\cache")
+CACHE_DIR = Path(__file__).parent.parent / "cache"
 
 
 def _zip_hash(zip_path: str) -> str:
