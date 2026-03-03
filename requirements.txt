@@ -1,0 +1,10 @@
+pdfplumber
+pdf2image
+pytesseract
+sentence-transformers
+openpyxl
+pandas
+numpy
+streamlit
+scikit-learn
+pillow
