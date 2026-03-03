@@ -5,6 +5,7 @@ sentence-transformers
 openpyxl
 pandas
 numpy
-streamlit
+streamlit==1.42.0
 scikit-learn
 pillow
+altair>=5.0.0
