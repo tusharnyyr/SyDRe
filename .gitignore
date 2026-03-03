@@ -1,0 +1,19 @@
+# Virtual environment — too large to upload (500MB+)
+venv/
+
+# Cache files — machine-specific, auto-generated
+cache/
+*.pkl
+
+# Input/Output — exclude to prevent accidental confidential data upload
+input/
+output/
+
+# Python cache — auto-generated
+__pycache__/
+*.pyc
+*.pyo
+
+# OS files
+.DS_Store
+Thumbs.db
